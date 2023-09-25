@@ -239,6 +239,13 @@ namespace Armtek
             ExchequerMenu.Visibility = Visibility.Visible;
             AuthorizationMenu.Visibility = Visibility.Collapsed;
             RegistrationMenu.Visibility = Visibility.Collapsed;
+            foreach(var item in navigationView.MenuItems)
+            {
+                if(item is NavigationViewItemSeparator itemSeparator)
+                {
+                    itemSeparator.Visibility = Visibility.Visible;
+                }
+            }
         }
         private bool CheckConnected()
         {

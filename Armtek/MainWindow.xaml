@@ -29,7 +29,7 @@
 
     <Grid>
         <Grid x:Name="DefaultGrid">
-            <Frame x:Name="mainFrame" Source="Pages/Authorization.xaml" Navigated="mainFrame_Navigated"/>
+            <Frame x:Name="mainFrame" Source="Pages/DefaultWindows/Authorization.xaml" Navigated="mainFrame_Navigated"/>
             <Grid x:Name="navigationGrid">
                 <ui:NavigationView x:Name="navigationView" 
                    IsBackEnabled="False" 
@@ -73,7 +73,7 @@
                                 <ui:NavigationViewItem x:Name="AgreementsWithClientsMenu" Content="Договоры с клиентами"/>
                             </ui:NavigationViewItem.MenuItems>
                         </ui:NavigationViewItem>
-                        <ui:NavigationViewItemSeparator/>
+                        <ui:NavigationViewItemSeparator x:Name="Sep_1"/>
                         <ui:NavigationViewItem x:Name="PurchasesMenu" Content="Покупки" Visibility="Collapsed" SelectsOnInvoked="False" IsTabStop="False" FontWeight="Bold">
                             <ui:NavigationViewItem.Icon>
                                 <ui:FontIcon Glyph="&#xEF40;"/>
@@ -85,7 +85,7 @@
                                 <ui:NavigationViewItem x:Name="PurchasingDocumentsMenu" Content="Документы закупки"/>
                             </ui:NavigationViewItem.MenuItems>
                         </ui:NavigationViewItem>
-                        <ui:NavigationViewItemSeparator/>
+                        <ui:NavigationViewItemSeparator Visibility="Collapsed"/>
                         <ui:NavigationViewItem x:Name="ExchequerMenu" Content="Казначейство" Visibility="Collapsed" SelectsOnInvoked="False" IsTabStop="False" FontWeight="Bold">
                             <ui:NavigationViewItem.MenuItems>
                                 <ui:NavigationViewItem Content="Безналичные платежи"/>
@@ -94,10 +94,10 @@
                                 <ui:NavigationViewItem Content="Отчёты по казначейству"/>
                             </ui:NavigationViewItem.MenuItems>
                         </ui:NavigationViewItem>
-                        <ui:NavigationViewItemSeparator/>
+                        <ui:NavigationViewItemSeparator Visibility="Collapsed"/>
                     </ui:NavigationView.MenuItems>
                     <ui:NavigationView.FooterMenuItems>
-                        <ui:NavigationViewItemSeparator/>
+                        <ui:NavigationViewItemSeparator Visibility="Collapsed"/>
                         <ui:NavigationViewItem x:Name="SettingsMenu" Content="Settings" Icon="Setting"/>
                     </ui:NavigationView.FooterMenuItems>
                 </ui:NavigationView>
