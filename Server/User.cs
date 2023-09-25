@@ -10,6 +10,6 @@ namespace Server
     {
         public string Name { get; set; }
         public string ID { get; set; }
-        public byte[] Photo { get; set; }
+        public DateTime LastLoginTime { get; set; }
     }
 }

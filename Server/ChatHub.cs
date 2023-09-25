@@ -38,16 +38,44 @@ namespace Server
         {
             if (!string.IsNullOrEmpty(name))
             {
-                Console.WriteLine($"++ {name} logged in");
-                List<User> users = new List<User>(ChatClients.Values);
-                User newUser = new User { Name = name, ID = Context.ConnectionId };
-                ChatClients[name] = newUser; // Обновляем запись, если пользователь уже существует
-                Clients.CallerState.UserName = name;
-                Clients.Others.ParticipantLogin(newUser);
-                return users;
+                User existingUser;
+                if (ChatClients.TryGetValue(name, out existingUser))
+                {
+                    // Проверяем время последнего входа
+                    var currentTime = DateTime.UtcNow;
+                    var timeSinceLastLogin = currentTime - existingUser.LastLoginTime;
+
+                    if (timeSinceLastLogin.TotalMinutes <= 10)
+                    {
+                        // Если прошло менее 10 минут, отправляем сообщение о перезаходе
+                        Console.WriteLine($"++ {name} reloaded");
+                    }
+                    else
+                    {
+                        // Если прошло более 10 минут, отправляем сообщение о входе
+                        Console.WriteLine($"++ {name} logged in");
+                    }
+
+                    // Обновляем время последнего входа
+                    existingUser.LastLoginTime = currentTime;
+                    Clients.CallerState.UserName = name;
+                    Clients.Others.ParticipantLogin(existingUser);
+                    return new List<User>(ChatClients.Values);
+                }
+                else
+                {
+                    // Пользователь не существует, создаем новую запись
+                    Console.WriteLine($"++ {name} logged in");
+                    var newUser = new User { Name = name, ID = Context.ConnectionId, LastLoginTime = DateTime.UtcNow };
+                    ChatClients[name] = newUser;
+                    Clients.CallerState.UserName = name;
+                    Clients.Others.ParticipantLogin(newUser);
+                    return new List<User>(ChatClients.Values);
+                }
             }
             return null;
         }
+
 
 
         public void Logout()
@@ -111,6 +139,14 @@ namespace Server
             User client = new User();
             ChatClients.TryGetValue(recepient, out client);
             Clients.Client(client.ID).ParticipantTyping(sender);
+        }
+        public void RecordUserAction(string action)
+        {
+            var userName = Clients.CallerState.UserName;
+            if (!string.IsNullOrEmpty(userName) && !string.IsNullOrEmpty(action))
+            {
+                Console.WriteLine($"{userName} clicked {action}");
+            }
         }
     }
 }

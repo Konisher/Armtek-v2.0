@@ -21,6 +21,7 @@ using System.Windows.Shapes;
 using Microsoft.AspNet.SignalR.Client;
 using Armtek.Pages.Sales;
 using Armtek.Pages;
+using static System.Collections.Specialized.BitVector32;
 
 namespace Armtek
 {
@@ -102,6 +103,7 @@ namespace Armtek
 
         private void NavigationView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
         {
+            var action = "ButtonSettings_Clicked";
             if (args.InvokedItem.Equals("Authorization") && !(mainFrame.Content is Pages.Authorization))
             {
                 Pages.Authorization authorizationPage = new Pages.Authorization();
@@ -181,7 +183,11 @@ namespace Armtek
                 {
                     navigationView.SelectedItem = SettingsMenu;
                 }
+                
             }
+            action = navigationView.SelectedItem.ToString();
+            string name = action.Substring(action.LastIndexOf(':') + 1).Trim();
+            HubProxy.Invoke("RecordUserAction", name);
         }
 
 
