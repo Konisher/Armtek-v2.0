@@ -1,0 +1,224 @@
+﻿<Page x:Class="Armtek.Pages.Authorization"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:Armtek.Pages"
+      mc:Ignorable="d"       
+      xmlns:ui="http://schemas.modernwpf.com/2019"
+      xmlns:wui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:pu="https://opensource.panuon.com/wpf-ui"
+
+            MinHeight="550"
+            MinWidth="800"
+            MaxHeight="1080"
+            MaxWidth="1920"
+            Background="#252526"
+            Foreground="#F1F1F1">
+
+    <Page.Resources>
+        <Style x:Key="SignInTextBoxStyle"
+               TargetType="{x:Type TextBox}"
+               BasedOn="{StaticResource {x:Type TextBox}}">
+            <Setter Property="pu:TextBoxHelper.FocusedBorderBrush"
+                    Value="#FF8DB8FF" />
+            <Setter Property="pu:TextBoxHelper.FocusedShadowColor"
+                    Value="#FF8DB8FF" />
+            <Setter Property="pu:TextBoxHelper.CornerRadius"
+                    Value="8" />
+            <Setter Property="pu:TextBoxHelper.WatermarkForeground"
+                    Value="#4A4A4A" />
+            <Setter Property="pu:TextBoxHelper.FocusedWatermarkForeground"
+                    Value="#AAAAAA" />
+            <Setter Property="pu:TextBoxHelper.ClearButtonVisibility"
+                    Value="VisibleOnFocusedAndNonnull"/>
+            <Setter Property="Height"
+                    Value="48" />
+            <Setter Property="Width"
+                    Value="338" />
+            <Setter Property="Padding"
+                    Value="10,0" />
+            <Setter Property="BorderThickness"
+                    Value="1"/>
+            <Setter Property="HorizontalAlignment"
+                    Value="Center"/>
+            <Setter Property="VerticalAlignment"
+                    Value="Center"/>
+        </Style>
+
+        <Style x:Key="SignInPasswordBoxStyle"
+               TargetType="{x:Type PasswordBox}"
+               BasedOn="{StaticResource {x:Type PasswordBox}}">
+            <Setter Property="pu:PasswordBoxHelper.FocusedBorderBrush"
+                    Value="#FF8DB8FF" />
+            <Setter Property="pu:PasswordBoxHelper.FocusedShadowColor"
+                    Value="#FF8DB8FF" />
+            <Setter Property="pu:PasswordBoxHelper.CornerRadius"
+                    Value="8" />
+            <Setter Property="pu:PasswordBoxHelper.WatermarkForeground"
+                    Value="#4A4A4A" />
+            <Setter Property="pu:PasswordBoxHelper.FocusedWatermarkForeground"
+                    Value="#AAAAAA" />
+            <Setter Property="pu:PasswordBoxHelper.ClearButtonVisibility"
+                    Value="VisibleOnHoverAndNonnull" />
+            <Setter Property="pu:PasswordBoxHelper.PlainButtonVisibility"
+                    Value="VisibleOnHoverAndNonnull"/>
+            <Setter Property="Height"
+                    Value="48" />
+            <Setter Property="Width"
+                    Value="348" />
+            <Setter Property="Padding"
+                    Value="10,0" />
+            <Setter Property="HorizontalAlignment"
+                    Value="Center"/>
+        </Style>
+
+        <Style x:Key="SignInButtonStyle"
+               TargetType="{x:Type Button}"
+               BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="pu:ButtonHelper.CornerRadius"
+                    Value="8" />
+            <Setter Property="Background"
+                    Value="#FF20ADFF" />
+            <Setter Property="Foreground"
+                    Value="White" />
+            <Setter Property="Height"
+                    Value="48" />
+            <Setter Property="Width"
+                    Value="338" />
+            <Setter Property="pu:ButtonHelper.PendingSpinStyle">
+                <Setter.Value>
+                    <Style TargetType="{x:Type pu:Spin}"
+                           BasedOn="{StaticResource {x:Static pu:ButtonHelper.PendingSpinStyleKey}}">
+                        <Setter Property="SpinStyle"
+                                Value="Ring2" />
+                    </Style>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!--<Style x:Key="HyperLinkStyle"
+               TargetType="{x:Type ui:HyperlinkButton}">
+            <Setter Property="ui:"/>
+        </Style>-->
+
+        <Style x:Key="RememberMeSwitchStyle"
+               TargetType="{x:Type pu:Switch}">
+            <Setter Property="ContentPlacement"
+                    Value="Left" />
+            <Setter Property="BoxHeight"
+                    Value="25" />
+            <Setter Property="BoxWidth"
+                    Value="45" />
+            <Setter Property="CheckedBackground"
+                    Value="#FF20ADFF" />
+            <Setter Property="Background"
+                    Value="#DEDEDE" />
+            <Setter Property="BorderBrush"
+                    Value="#DEDEDE" />
+            <Setter Property="Foreground"
+                    Value="LightGray" />
+            <Setter Property="ToggleSize"
+                    Value="20" />
+            <Setter Property="ToggleShadowColor"
+                    Value="{x:Null}" />
+            <Setter Property="CheckedBorderBrush"
+                    Value="#6CBCEA" />
+        </Style>
+
+        <Style x:Key="InputFormGroupStyle"
+               TargetType="{x:Type pu:FormGroup}">
+            <Setter Property="Width"
+                    Value="350" />
+        </Style>
+    </Page.Resources>
+
+
+    <Grid x:Name="DefaultGrid">
+        <Grid x:Name="gridMain" 
+              Visibility="Visible"
+              HorizontalAlignment="Center"
+              VerticalAlignment="Center" Height="378" Width="358">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Image Height="25"
+                   HorizontalAlignment="Left"
+                   RenderOptions.BitmapScalingMode="HighQuality" />
+            <pu:FormGroup x:Name="FrmAccount"
+                          Grid.Row="1"
+                          Margin="0,50,0,0"
+                          Style="{StaticResource InputFormGroupStyle}">
+                <TextBox x:Name="TbAccount"
+                         Style="{StaticResource SignInTextBoxStyle}"
+                         pu:TextBoxHelper.InputLimit="UpperCaseLetters,LowerCaseLetters,Digit,At,Point"
+                         pu:TextBoxHelper.Watermark="UserName / Email / Phone" 
+                         TextChanged="TbAccount_TextChanged" FontSize="16" Width="347"/>
+            </pu:FormGroup>
+            <pu:FormGroup x:Name="FrmPassword"
+                          Grid.Row="2"
+                          Margin="0,20,0,0"
+                          HeaderPadding="0,4,0,0"
+                          Style="{StaticResource InputFormGroupStyle}"
+                          MinMessageHeight="22">
+                <PasswordBox x:Name="PwdPassword"
+                             Style="{StaticResource SignInPasswordBoxStyle}"
+                             pu:PasswordBoxHelper.Watermark="Password"
+                             
+                             PasswordChanged="PasswordBox_PasswordChanged" FontSize="16" />
+            </pu:FormGroup>
+            <pu:Switch Grid.Row="3"
+                       HorizontalAlignment="Right"
+                       Margin="0,25,10,0"
+                       Style="{StaticResource RememberMeSwitchStyle}"
+                       Content="Remember Me" FontSize="14"/>
+            <Button x:Name="BtnLogin"
+                    Grid.Row="4"
+                    Margin="0,10,0,0"
+                    Content="Sign In"
+                    Style="{StaticResource SignInButtonStyle}"
+                    Click="BtnLogin_Click"/>
+            <ui:ProgressRing x:Name="progressRing" 
+                             IsActive="False" 
+                             Width="70" 
+                             Height="70" 
+                             HorizontalAlignment="Left" 
+                             Margin="142,76,0,0" 
+                             Grid.RowSpan="2" 
+                             Grid.Row="1" 
+                             VerticalAlignment="Top"/>
+            <TextBlock VerticalAlignment="Center" 
+                       HorizontalAlignment="Center" 
+                       Text="Messenger" 
+                       FontSize="40" 
+                       FontFamily="pack://application:,,,/WpfApp6;Fonts/#HaloHandletter"/>
+
+            <ui:HyperlinkButton
+                                x:Name="NoAccount"
+                                Grid.Row="5"
+                                Width="140"
+                                Height="30"
+                                Content="Your Have account?" 
+                                FontSize="13" Click="NoAccount_Click" BorderThickness="15,0,0,0"/>
+        </Grid>
+
+
+
+        <wui:Snackbar x:Name="snackBarSignIn"
+                      Title="Info"
+                      Appearance="Success"
+                      Timeout="6000"
+                      Icon="Sticker24"
+                      HorizontalAlignment="Center"
+                      Width="720" Height="80"
+                      Margin="40,24,24,44" FontSize="15"
+                      
+                      />
+    </Grid>
+</Page>
