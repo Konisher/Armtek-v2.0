@@ -27,8 +27,6 @@ namespace Armtek.Pages
     public partial class Authorization : System.Windows.Controls.Page
     {
         DispatcherTimer timer;
-        /*        public static HubConnection Connection { get; private set; }
-                public static IHubProxy HubProxy { get; private set; }*/
         public event EventHandler AuthenticationSuccess;
 
         private void OnAuthenticationSuccess()
@@ -38,7 +36,6 @@ namespace Armtek.Pages
         public Authorization()
         {
             InitializeComponent();
-            //InitializeSignalR();
         }
         private void BtnLogin_Click(object sender, RoutedEventArgs e)
         {
@@ -132,23 +129,5 @@ namespace Armtek.Pages
                 mainWin.mainFrame.Navigate(registrationPage);
             }
         }
-        /*private void InitializeSignalR()
-        {
-            string serverUrl = "http://localhost:8080/signalchat";
-            Connection = new HubConnection(serverUrl);
-            HubProxy = Connection.CreateHubProxy("ChatHub");
-            try
-            {
-                Connection.Start().Wait();
-                Connection.Closed += () =>
-                {
-                    MessageBox.Show("Disconnected from the server.");
-                };
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error connecting to the server: {ex.Message}");
-            }
-        }*/
     }
 }
