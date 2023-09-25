@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Server
 {
-    public class ChatHub : Hub<IClient>
+    public class ChatHub : Microsoft.AspNet.SignalR.Hub<IClient>
     {
         private static ConcurrentDictionary<string, User> ChatClients = new ConcurrentDictionary<string, User>();
 
@@ -36,19 +36,19 @@ namespace Server
 
         public List<User> Login(string name)
         {
-            if (!ChatClients.ContainsKey(name))
+            if (!string.IsNullOrEmpty(name))
             {
                 Console.WriteLine($"++ {name} logged in");
                 List<User> users = new List<User>(ChatClients.Values);
                 User newUser = new User { Name = name, ID = Context.ConnectionId };
-                var added = ChatClients.TryAdd(name, newUser);
-                if (!added) return null;
+                ChatClients[name] = newUser; // Обновляем запись, если пользователь уже существует
                 Clients.CallerState.UserName = name;
                 Clients.Others.ParticipantLogin(newUser);
                 return users;
             }
             return null;
         }
+
 
         public void Logout()
         {

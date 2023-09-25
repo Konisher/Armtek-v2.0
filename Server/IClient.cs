@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Server
 {
-    internal interface IClient
+    public interface IClient
     {
         void ParticipantDisconnection(string name);
         void ParticipantReconnection(string name);
