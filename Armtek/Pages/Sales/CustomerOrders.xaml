@@ -15,8 +15,64 @@
       MaxWidth="1920"
       Background="#252526"
       Foreground="#F1F1F1">
+    <Page.Resources>
+        <Style TargetType="Calendar">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Calendar">
+                        <Grid>
+                            <wui:ProgressRing Width="60" Height="60"
+                                  IsIndeterminate="False"
+                                  Background="LightGray" Progress="100"
+                                  Grid.Row="0"/>
+                            <TextBlock Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=DisplayDate.Day}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" />
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
 
-    <Grid>
-        <TextBlock Text="Welcome to the Заказы клиентов!" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center" />
+    <Grid x:Name="DefaultGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <Border x:Name="gridMainBorder"
+            Visibility="Visible"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Stretch"
+            Height="358"
+            Width="598"
+            Margin="50,30,0,0"
+            Background="#FF424242"
+            CornerRadius="10"
+            Grid.Column="0" Grid.Row="0">
+            <Grid x:Name="gridMain">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Calendar Width="120" Height="120"/>
+            </Grid>
+        </Border>
     </Grid>
 </Page>
+    
