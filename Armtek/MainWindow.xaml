@@ -41,8 +41,8 @@
                    IsSettingsVisible="False"
                    IsPaneOpen="True">
                     <ui:NavigationView.MenuItems>
-                        <ui:NavigationViewItem x:Name="AuthorizationMenu" Content="Authorization" Icon="Home"/>
-                        <ui:NavigationViewItem x:Name="RegistrationMenu" Content="Registration">
+                        <ui:NavigationViewItem x:Name="AuthorizationMenu" Content="Авторизация" Icon="Home"/>
+                        <ui:NavigationViewItem x:Name="RegistrationMenu" Content="Регистрация">
                             <ui:NavigationViewItem.Icon>
                                 <ui:FontIcon Glyph="&#xE748;"/>
                             </ui:NavigationViewItem.Icon>
@@ -98,7 +98,7 @@
                     </ui:NavigationView.MenuItems>
                     <ui:NavigationView.FooterMenuItems>
                         <ui:NavigationViewItemSeparator Visibility="Collapsed"/>
-                        <ui:NavigationViewItem x:Name="SettingsMenu" Content="Settings" Icon="Setting"/>
+                        <ui:NavigationViewItem x:Name="SettingsMenu" Content="Настройки" Icon="Setting"/>
                     </ui:NavigationView.FooterMenuItems>
                 </ui:NavigationView>
             </Grid>

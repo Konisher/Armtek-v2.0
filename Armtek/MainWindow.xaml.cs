@@ -32,10 +32,39 @@ namespace Armtek
     {
         public static HubConnection Connection { get; private set; }
         public static IHubProxy HubProxy { get; private set; }
+        private Dictionary<Type, NavigationViewItem> pageToMenuItemMap;
+        private Dictionary<string, Type> menuItemToPageTypeMap;
         public MainWindow()
         {
             InitializeComponent();
             InitializeSignalR();
+            InitializeMenu();
+        }
+        private void InitializeMenu() 
+        {
+            pageToMenuItemMap = new Dictionary<Type, NavigationViewItem>
+            {
+                { typeof(Pages.Authorization), AuthorizationMenu },
+                { typeof(Registration), RegistrationMenu },
+                { typeof(CustomerOrders), CustomerOrdersMenu },
+                { typeof(AgreementsWithClients), AgreementsWithClientsMenu },
+                { typeof(SalesDocuments), SalesDocumentsMenu },
+                { typeof(SalesReport), SalesReportMenu },
+                { typeof(SalesAssistant), SalesAssistantMenu },
+                { typeof(Pages.Settings), SettingsMenu }
+            };
+            menuItemToPageTypeMap = new Dictionary<string, Type>
+            {
+                { "Авторизация", typeof(Pages.Authorization) },
+                { "Регистрация", typeof(Registration) },
+                { "Заказы клиентов", typeof(CustomerOrders) },
+                { "Договоры с клиентами", typeof(AgreementsWithClients) },
+                { "Клиенты", typeof(Clients) },
+                { "Документы продажи", typeof(SalesDocuments) },
+                { "Отчёт по продажам", typeof(SalesReport) },
+                { "Помощник продаж", typeof(SalesAssistant) },
+                { "Настройки", typeof(Pages.Settings) }
+            };
         }
         private void InitializeSignalR()
         {
@@ -103,138 +132,30 @@ namespace Armtek
 
         private void NavigationView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
         {
-            var action = "ButtonSettings_Clicked";
-            if (args.InvokedItem.Equals("Authorization") && !(mainFrame.Content is Pages.Authorization))
+            if (menuItemToPageTypeMap.TryGetValue(args.InvokedItem.ToString(), out Type pageType))
             {
-                Pages.Authorization authorizationPage = new Pages.Authorization();
-                if (mainFrame.Navigate(authorizationPage))
+                if (!(mainFrame.Content is System.Windows.Controls.Page currentPage) || currentPage.GetType() != pageType)
                 {
-                    navigationView.SelectedItem = AuthorizationMenu;
+                    System.Windows.Controls.Page newPage = (System.Windows.Controls.Page)Activator.CreateInstance(pageType);
+                    if (mainFrame.Navigate(newPage))
+                    {
+                        navigationView.SelectedItem = args.InvokedItem;
+                    }
                 }
             }
-            else if (args.InvokedItem.Equals("Registration") && !(mainFrame.Content is Registration))
-            {
-                Registration registrationPage = new Registration();
-                if (mainFrame.Navigate(registrationPage))
-                {
-                    navigationView.SelectedItem = RegistrationMenu;
-                }
-            }
-            else if (args.InvokedItem.Equals("Заказы клиентов"))
-            {
-                CustomerOrders defaultWindowPage = new CustomerOrders();
-                if (mainFrame.Navigate(defaultWindowPage))
-                {
-                    navigationView.SelectedItem = CustomerOrdersMenu;
-                }
-            }
-            else if (args.InvokedItem.Equals("Договоры с клиентами"))
-            {
-                AgreementsWithClients defaultWindowPage = new AgreementsWithClients();
-                if (mainFrame.Navigate(defaultWindowPage))
-                {
-                    navigationView.SelectedItem = AgreementsWithClientsMenu;
-                }
-            }
-            else if (args.InvokedItem.Equals("Клиенты"))
-            {
-                Clients defaultWindowPage = new Clients();
-                if (mainFrame.Navigate(defaultWindowPage))
-                {
-                    navigationView.SelectedItem = ClientsMenu;
-                }
-            }
-            else if (args.InvokedItem.Equals("Заказы клиентов"))
-            {
-                CustomerOrders defaultWindowPage = new CustomerOrders();
-                if (mainFrame.Navigate(defaultWindowPage))
-                {
-                    navigationView.SelectedItem = CustomerOrdersMenu;
-                }
-            }
-            else if (args.InvokedItem.Equals("Документы продажи"))
-            {
-                SalesDocuments defaultWindowPage = new SalesDocuments();
-                if (mainFrame.Navigate(defaultWindowPage))
-                {
-                    navigationView.SelectedItem = SalesDocumentsMenu;
-                }
-            }
-            else if (args.InvokedItem.Equals("Отчёт по продажам"))
-            {
-                SalesReport defaultWindowPage = new SalesReport();
-                if (mainFrame.Navigate(defaultWindowPage))
-                {
-                    navigationView.SelectedItem = SalesReportMenu;
-                }
-            }
-            else if (args.InvokedItem.Equals("Помощник продаж"))
-            {
-                SalesAssistant defaultWindowPage = new SalesAssistant();
-                if (mainFrame.Navigate(defaultWindowPage))
-                {
-                    navigationView.SelectedItem = SalesAssistantMenu;
-                }
-            }
-            else if (args.InvokedItem.Equals("Settings"))
-            {
-                Pages.Settings settingsPage = new Pages.Settings();
-                if (mainFrame.Navigate(settingsPage))
-                {
-                    navigationView.SelectedItem = SettingsMenu;
-                }
-                
-            }
-            action = navigationView.SelectedItem.ToString();
-            string name = action.Substring(action.LastIndexOf(':') + 1).Trim();
+            string name = args.InvokedItem.ToString();
             HubProxy.Invoke("RecordUserAction", name);
         }
 
-
         private void mainFrame_Navigated(object sender, NavigationEventArgs e)
         {
-
-            if (e.Content is Pages.Authorization)
+            if (pageToMenuItemMap.ContainsKey(e.Content.GetType()))
             {
-                var authorizationPage = e.Content as Pages.Authorization;
-                if (authorizationPage != null)
+                navigationView.SelectedItem = pageToMenuItemMap[e.Content.GetType()];
+                if (e.Content is Pages.Authorization authorizationPage)
                 {
                     authorizationPage.AuthenticationSuccess += AuthorizationPage_AuthenticationSuccess;
                 }
-                navigationView.SelectedItem = AuthorizationMenu;
-            }
-            else if (e.Content is Registration)
-            {
-                navigationView.SelectedItem = RegistrationMenu;
-            }
-            else if (e.Content is CustomerOrders)
-            {
-                navigationView.SelectedItem = CustomerOrdersMenu;
-            }
-            else if (e.Content is AgreementsWithClients)
-            {
-                navigationView.SelectedItem = AgreementsWithClientsMenu;
-            }
-            else if (e.Content is CustomerOrders)
-            {
-                navigationView.SelectedItem = CustomerOrdersMenu;
-
-            }
-            else if (e.Content is SalesDocuments)
-            {
-                navigationView.SelectedItem = SalesDocumentsMenu;
-            }
-            else if (e.Content is SalesReport)
-            {
-                navigationView.SelectedItem = SalesReportMenu;
-            }
-            else if (e.Content is SalesAssistant)
-            {
-                navigationView.SelectedItem = SalesAssistantMenu;
-            }
-            else if (e.Content is Pages.Settings)
-            {
-                navigationView.SelectedItem = SettingsMenu;
             }
         }
 
