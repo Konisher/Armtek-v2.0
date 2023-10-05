@@ -11,15 +11,9 @@ namespace Armtek.Pages.Sales
 {
     public partial class CustomerOrders : System.Windows.Controls.Page
     {
-        public SolidColorBrush ProgressRingColor { get; set; }
         public CustomerOrders()
         {
             InitializeComponent();
-            DataContext = this;
-        }
-
-        private void Calendar_DisplayDateChanged(object sender, CalendarDateChangedEventArgs e)
-        {
             int selectedMonth = CustomCalendar.DisplayDate.Month;
             int selectedYear = CustomCalendar.DisplayDate.Year;
 
@@ -30,11 +24,37 @@ namespace Armtek.Pages.Sales
                 DateTime buttonDate = (DateTime)progressRing.DataContext;
                 if (buttonDate.Month == selectedMonth && buttonDate.Year == selectedYear)
                 {
-                    progressRing.Foreground = new SolidColorBrush(Colors.Green);
+                    /*progressRing.Foreground = new SolidColorBrush(Colors.Green);*/
+                    progressRing.Visibility = Visibility.Visible;
                 }
                 else
                 {
-                    progressRing.Foreground = new SolidColorBrush(Colors.Red);
+                    /*progressRing.Foreground = new SolidColorBrush(Colors.Red);*/
+                    progressRing.Visibility = Visibility.Collapsed;
+                }
+            }
+        }
+
+        private void Calendar_DisplayDateChanged(object sender, CalendarDateChangedEventArgs e)
+        {
+            
+            int selectedMonth = CustomCalendar.DisplayDate.Month;
+            int selectedYear = CustomCalendar.DisplayDate.Year;
+
+            var progressRings = FindVisualChildren<ProgressRing>(CustomCalendar);
+
+            foreach (var progressRing in progressRings)
+            {
+                DateTime buttonDate = (DateTime)progressRing.DataContext;
+                if (buttonDate.Month == selectedMonth && buttonDate.Year == selectedYear)
+                {
+                    /*progressRing.Foreground = new SolidColorBrush(Colors.Green);*/
+                    progressRing.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    /*progressRing.Foreground = new SolidColorBrush(Colors.Red);*/
+                    progressRing.Visibility = Visibility.Collapsed;
                 }
             }
         }

@@ -63,7 +63,8 @@
                                                      Height="30"
                                                      HorizontalAlignment="Center"
                                                      VerticalAlignment="Center"
-                                                              Tag="{x:Static sys:DateTime.Now}"/>
+                                                              Tag="{x:Static sys:DateTime.Now}"
+                                                              Visibility="Visible"/>
                                             <TextBlock Name="DayOfWeekText"
                                                    Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=DayOfWeek}"
                                                    HorizontalAlignment="Center"
@@ -75,15 +76,6 @@
                         </Style>
                     </Calendar.CalendarDayButtonStyle>
                 </Calendar>
-                <ComboBox Width="100" Height="30" x:Name="comboBox1">
-                    <ComboBoxItem>
-                        <StackPanel>
-                            <TextBlock Text="Сентябрь"/>
-                            <TextBlock Text="Октябрь"/>
-                            <TextBlock Text="Ноябрь"/>
-                        </StackPanel>
-                    </ComboBoxItem>
-                </ComboBox>
             </Grid>
         </Border>
     </Grid>
