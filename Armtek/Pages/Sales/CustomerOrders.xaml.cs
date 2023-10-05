@@ -1,87 +1,62 @@
-﻿using ModernWpf.Controls;
+﻿using System.Windows.Controls;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
+using Wpf.Ui.Controls;
+using System.Collections.Generic;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using System.Linq;
+using System.Windows.Controls.Primitives;
 
 namespace Armtek.Pages.Sales
 {
-    /// <summary>
-    /// Логика взаимодействия для CustomerOrders.xaml
-    /// </summary>
     public partial class CustomerOrders : System.Windows.Controls.Page
     {
-
+        public SolidColorBrush ProgressRingColor { get; set; }
         public CustomerOrders()
         {
             InitializeComponent();
+            DataContext = this;
         }
+
         private void Calendar_DisplayDateChanged(object sender, CalendarDateChangedEventArgs e)
         {
-            DateTime selectedMonth = CustomCalendar.DisplayDate;
-            DateTime firstDayOfMonth = new DateTime(selectedMonth.Year, selectedMonth.Month, 1);
-            DateTime lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
+            int selectedMonth = CustomCalendar.DisplayDate.Month;
+            int selectedYear = CustomCalendar.DisplayDate.Year;
 
-            foreach (var dayButton in FindVisualChildren<CalendarDayButton>(CustomCalendar)) // You can replace FindVisualChildren with your own implementation
+            var progressRings = FindVisualChildren<ProgressRing>(CustomCalendar);
+
+            foreach (var progressRing in progressRings)
             {
-                DateTime day = (DateTime)dayButton.DataContext;
-                if (day < firstDayOfMonth || day > lastDayOfMonth)
+                DateTime buttonDate = (DateTime)progressRing.DataContext;
+                if (buttonDate.Month == selectedMonth && buttonDate.Year == selectedYear)
                 {
-                    ProgressRing progressRing = FindVisualChild<ProgressRing>(dayButton); // You can replace FindVisualChild with your own implementation
-                    progressRing.Visibility = Visibility.Collapsed;
+                    progressRing.Foreground = new SolidColorBrush(Colors.Green);
+                }
+                else
+                {
+                    progressRing.Foreground = new SolidColorBrush(Colors.Red);
                 }
             }
         }
 
-        private static T FindVisualChild<T>(DependencyObject parent) where T : DependencyObject
+        private IEnumerable<T> FindVisualChildren<T>(DependencyObject parent) where T : DependencyObject
         {
-            T child = null;
-            int numVisuals = VisualTreeHelper.GetChildrenCount(parent);
-            for (int i = 0; i < numVisuals; i++)
+            var children = new List<T>();
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
             {
-                DependencyObject visual = VisualTreeHelper.GetChild(parent, i);
-                child = visual as T;
-                if (child == null)
+                DependencyObject child = VisualTreeHelper.GetChild(parent, i);
+                if (child is T typedChild)
                 {
-                    child = FindVisualChild<T>(visual);
+                    children.Add(typedChild);
                 }
-                if (child != null)
+                else
                 {
-                    break;
+                    children.AddRange(FindVisualChildren<T>(child));
                 }
             }
-            return child;
+            return children;
         }
 
-        private static IEnumerable<T> FindVisualChildren<T>(DependencyObject parent) where T : DependencyObject
-        {
-            if (parent != null)
-            {
-                for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
-                {
-                    DependencyObject child = VisualTreeHelper.GetChild(parent, i);
-                    if (child is T)
-                    {
-                        yield return (T)child;
-                    }
 
-                    foreach (T descendant in FindVisualChildren<T>(child))
-                    {
-                        yield return descendant;
-                    }
-                }
-            }
-        }
     }
 }
