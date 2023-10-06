@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Windows.Media;
 using System.Linq;
 using System.Windows.Controls.Primitives;
+using System.Text.RegularExpressions;
+using Windows.UI.ViewManagement;
 
 namespace Armtek.Pages.Sales
 {
@@ -57,6 +59,7 @@ namespace Armtek.Pages.Sales
                     progressRing.Visibility = Visibility.Collapsed;
                 }
             }
+
         }
 
         private IEnumerable<T> FindVisualChildren<T>(DependencyObject parent) where T : DependencyObject
@@ -77,6 +80,55 @@ namespace Armtek.Pages.Sales
             return children;
         }
 
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            int selectedMonth = CustomCalendar.DisplayDate.Month;
+            int selectedYear = CustomCalendar.DisplayDate.Year;
 
+            var progressRings = FindVisualChildren<ProgressRing>(CustomCalendar);
+
+            foreach (var progressRing in progressRings)
+            {
+                DateTime buttonDate = (DateTime)progressRing.DataContext;
+                progressRing.Tag = buttonDate;
+                if (buttonDate.Month == selectedMonth && buttonDate.Year == selectedYear)
+                {
+                    /*progressRing.Foreground = new SolidColorBrush(Colors.Green);*/
+                    progressRing.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    /*progressRing.Foreground = new SolidColorBrush(Colors.Red);*/
+                    progressRing.Visibility = Visibility.Collapsed;
+                }
+            }
+        }
+
+
+        private void textbox1_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (textbox1.Text.Length == 2 || textbox1.Text.Length == 5)
+            {
+                textbox1.Text += ".";
+                textbox1.CaretIndex = textbox1.Text.Length;
+            }
+            else if (textbox1.Text.Length == 10)
+            {
+                if (DateTime.TryParseExact(textbox1.Text, "dd.MM.yyyy", null, System.Globalization.DateTimeStyles.None, out DateTime inputDate))
+                {
+                    var progressRings = FindVisualChildren<ProgressRing>(CustomCalendar);
+
+                    foreach (var progressRing in progressRings)
+                    {
+                        DateTime buttonDate = (DateTime)progressRing.Tag;
+                        if (buttonDate.Day == inputDate.Day && buttonDate.Month == inputDate.Month && buttonDate.Year == inputDate.Year)
+                        {
+                            progressRing.Foreground = new SolidColorBrush(Colors.Green);
+                            progressRing.Progress = 10;
+                        }
+                    }
+                }
+            }
+        }
     }
 }

@@ -15,8 +15,7 @@
       MaxHeight="1080"
       MaxWidth="1920"
       Background="#252526"
-      Foreground="#F1F1F1">
-
+      Foreground="#F1F1F1" Loaded="Page_Loaded">
 
     <Grid x:Name="DefaultGrid">
         <Grid.RowDefinitions>
@@ -31,26 +30,21 @@
                 Visibility="Visible"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Stretch"
-                Height="358"
+                Height="400"
                 Width="598"
                 Margin="50,30,0,0"
                 Background="#FF424242"
                 CornerRadius="10"
                 Grid.Column="0" Grid.Row="0">
             <Grid x:Name="gridMain">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="260"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <Calendar Name="CustomCalendar" Width="240" HorizontalAlignment="Left" VerticalAlignment="Top" Grid.Column="1" Margin="54,-9,0,0" DisplayDateChanged="Calendar_DisplayDateChanged" >
+                <Calendar Name="CustomCalendar" 
+                          Width="598"
+                          Height="400"
+                          HorizontalAlignment="Left" 
+                          VerticalAlignment="Top"
+                          Grid.Column="1" 
+                          
+                          DisplayDateChanged="Calendar_DisplayDateChanged">
                     <Calendar.CalendarDayButtonStyle>
                         <Style TargetType="CalendarDayButton">
                             <Setter Property="Template">
@@ -58,25 +52,28 @@
                                     <ControlTemplate TargetType="CalendarDayButton">
                                         <Grid>
                                             <wui:ProgressRing x:Name="progressRing1"
-                                                     Progress="100"
-                                                     Width="30"
-                                                     Height="30"
-                                                     HorizontalAlignment="Center"
-                                                     VerticalAlignment="Center"
-                                                              Tag="{x:Static sys:DateTime.Now}"
-                                                              Visibility="Visible"/>
-                                            <TextBlock Name="DayOfWeekText"
-                                                   Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=DayOfWeek}"
-                                                   HorizontalAlignment="Center"
-                                                   VerticalAlignment="Top"/>
+                                              Progress="70"
+                                              Width="50"
+                                              Height="50"
+                                              Margin="5,5,5,-3"
+                                              HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              Tag="{x:Static sys:DateTime.Now}"
+                                              Visibility="Visible"
+                                              Background="Yellow">
+                                            </wui:ProgressRing>
                                         </Grid>
                                     </ControlTemplate>
+
                                 </Setter.Value>
                             </Setter>
                         </Style>
                     </Calendar.CalendarDayButtonStyle>
                 </Calendar>
+
             </Grid>
         </Border>
+        <TextBlock InputScope="Date" Margin="438,45,84,-131" Grid.Row="1"/>
+        <TextBox x:Name="textbox1" Margin="96,43,336,-81" Grid.Row="1" InputScope="Date" TextChanged="textbox1_TextChanged"/>
     </Grid>
 </Page>
