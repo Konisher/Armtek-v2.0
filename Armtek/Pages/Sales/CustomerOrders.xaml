@@ -17,10 +17,13 @@
       Background="#252526"
       Foreground="#F1F1F1" Loaded="Page_Loaded">
 
+    
+    
     <Grid x:Name="DefaultGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
@@ -47,24 +50,22 @@
                           DisplayDateChanged="Calendar_DisplayDateChanged">
                     <Calendar.CalendarDayButtonStyle>
                         <Style TargetType="CalendarDayButton">
+                            <EventSetter Event="MouseEnter" Handler="CalendarDayButton_MouseEnter"/>
+                            <EventSetter Event="MouseLeave" Handler="CalendarDayButton_MouseLeave"/>
                             <Setter Property="Template">
                                 <Setter.Value>
                                     <ControlTemplate TargetType="CalendarDayButton">
                                         <Grid>
                                             <wui:ProgressRing x:Name="progressRing1"
-                                              Progress="70"
-                                              Width="50"
-                                              Height="50"
-                                              Margin="5,5,5,-3"
-                                              HorizontalAlignment="Center"
-                                              VerticalAlignment="Center"
-                                              Tag="{x:Static sys:DateTime.Now}"
-                                              Visibility="Visible"
-                                              Background="Yellow">
-                                            </wui:ProgressRing>
+                                      Progress="70"
+                                      Width="50"
+                                      Height="50"
+                                      Margin="5,5,5,-3"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"
+                                      Visibility="Visible"/>
                                         </Grid>
                                     </ControlTemplate>
-
                                 </Setter.Value>
                             </Setter>
                         </Style>
@@ -73,7 +74,15 @@
 
             </Grid>
         </Border>
-        <TextBlock InputScope="Date" Margin="438,45,84,-131" Grid.Row="1"/>
+        <TextBlock InputScope="Date" Margin="438,45,84,-131" Grid.Row="1" Grid.ColumnSpan="1"/>
         <TextBox x:Name="textbox1" Margin="96,43,336,-81" Grid.Row="1" InputScope="Date" TextChanged="textbox1_TextChanged"/>
+        <wui:InfoBar x:Name="infoBar1" Title="Info" 
+                    IsOpen="True"
+                    IsClosable="True"
+                     Grid.Row="2"
+                     Width="550"
+                     HorizontalAlignment="Center"
+                     VerticalAlignment="Bottom"
+                     Margin="0,0,0,55"/>
     </Grid>
 </Page>
