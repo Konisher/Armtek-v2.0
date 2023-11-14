@@ -10,15 +10,13 @@
       xmlns:ui="http://schemas.modernwpf.com/2019"
       xmlns:wui="http://schemas.lepo.co/wpfui/2022/xaml"
       xmlns:pu="https://opensource.panuon.com/wpf-ui"
-      MinHeight="550"
-      MinWidth="800"
-      MaxHeight="1080"
-      MaxWidth="1920"
+        MinHeight="550"
+        MinWidth="800"
+        MaxHeight="1080"
+        MaxWidth="1940"
       Background="#252526"
-      Foreground="#F1F1F1" Loaded="Page_Loaded">
+      Foreground="#F1F1F1">
 
-    
-    
     <Grid x:Name="DefaultGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -30,6 +28,7 @@
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
         <Border x:Name="gridMainBorder"
+                Panel.ZIndex="2"
                 Visibility="Visible"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Stretch"
@@ -40,49 +39,10 @@
                 CornerRadius="10"
                 Grid.Column="0" Grid.Row="0">
             <Grid x:Name="gridMain">
-                <Calendar Name="CustomCalendar" 
-                          Width="598"
-                          Height="400"
-                          HorizontalAlignment="Left" 
-                          VerticalAlignment="Top"
-                          Grid.Column="1" 
-                          
-                          DisplayDateChanged="Calendar_DisplayDateChanged">
-                    <Calendar.CalendarDayButtonStyle>
-                        <Style TargetType="CalendarDayButton">
-                            <EventSetter Event="MouseEnter" Handler="CalendarDayButton_MouseEnter"/>
-                            <EventSetter Event="MouseLeave" Handler="CalendarDayButton_MouseLeave"/>
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="CalendarDayButton">
-                                        <Grid>
-                                            <wui:ProgressRing x:Name="progressRing1"
-                                      Progress="70"
-                                      Width="50"
-                                      Height="50"
-                                      Margin="5,5,5,-3"
-                                      HorizontalAlignment="Center"
-                                      VerticalAlignment="Center"
-                                      Visibility="Visible"/>
-                                        </Grid>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </Calendar.CalendarDayButtonStyle>
-                </Calendar>
-
+                <WebBrowser x:Name="webYandexAPI"
+                            Panel.ZIndex="1"
+                        Grid.Column="0" Grid.Row="1"/>
             </Grid>
         </Border>
-        <TextBlock InputScope="Date" Margin="438,45,84,-131" Grid.Row="1" Grid.ColumnSpan="1"/>
-        <TextBox x:Name="textbox1" Margin="96,43,336,-81" Grid.Row="1" InputScope="Date" TextChanged="textbox1_TextChanged"/>
-        <wui:InfoBar x:Name="infoBar1" Title="Info" 
-                    IsOpen="True"
-                    IsClosable="True"
-                     Grid.Row="2"
-                     Width="550"
-                     HorizontalAlignment="Center"
-                     VerticalAlignment="Bottom"
-                     Margin="0,0,0,55"/>
     </Grid>
 </Page>
