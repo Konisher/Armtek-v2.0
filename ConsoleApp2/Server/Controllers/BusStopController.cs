@@ -113,7 +113,7 @@ namespace Server.Controllers
 
             return busStops;
         }
-        private static YandexApiResponse DeserializeJsonResponse(string responseBody)
+        private static YandexApiResponse? DeserializeJsonResponse(string responseBody)
         {
             try
             {
