@@ -1,6 +1,6 @@
 @Server_HostAddress = http://localhost:5088
 
-GET {{Server_HostAddress}}/BusStop/GetBusStops?
+GET {{Server_HostAddress}}
 Accept: application/json
 
 

@@ -3,12 +3,33 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 class Program
 {
+    public static string GenerateApiKey(int length = 32)
+    {
+        const string validChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        char[] chars = new char[length];
+
+        using (RNGCryptoServiceProvider crypto = new RNGCryptoServiceProvider())
+        {
+            byte[] data = new byte[length];
+            crypto.GetBytes(data);
+
+            for (int i = 0; i < length; i++)
+            {
+                chars[i] = validChars[data[i] % validChars.Length];
+            }
+        }
+
+        return new string(chars);
+    }
     static void Main(string[] args)
     {
+        string apiKey = GenerateApiKey();
+        Console.WriteLine($"Generated API Key: {apiKey}");
         // Sample user location
         double userLatitude = 52.4121;
         double userLongitude = 41.3770;
