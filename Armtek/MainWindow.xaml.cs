@@ -19,9 +19,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.AspNet.SignalR.Client;
-using Armtek.Pages.Sales;
 using Armtek.Pages;
 using static System.Collections.Specialized.BitVector32;
+using Armtek.Pages.DefaultWindows;
 
 namespace Armtek
 {
@@ -38,33 +38,6 @@ namespace Armtek
         {
             InitializeComponent();
             InitializeSignalR();
-            InitializeMenu();
-        }
-        private void InitializeMenu() 
-        {
-            pageToMenuItemMap = new Dictionary<Type, NavigationViewItem>
-            {
-                { typeof(Pages.Authorization), AuthorizationMenu },
-                { typeof(Registration), RegistrationMenu },
-                { typeof(CustomerOrders), CustomerOrdersMenu },
-                { typeof(AgreementsWithClients), AgreementsWithClientsMenu },
-                { typeof(SalesDocuments), SalesDocumentsMenu },
-                { typeof(SalesReport), SalesReportMenu },
-                { typeof(SalesAssistant), SalesAssistantMenu },
-                { typeof(Pages.Settings), SettingsMenu }
-            };
-            menuItemToPageTypeMap = new Dictionary<string, Type>
-            {
-                { "Авторизация", typeof(Pages.Authorization) },
-                { "Регистрация", typeof(Registration) },
-                { "Заказы клиентов", typeof(CustomerOrders) },
-                { "Договоры с клиентами", typeof(AgreementsWithClients) },
-                { "Клиенты", typeof(Clients) },
-                { "Документы продажи", typeof(SalesDocuments) },
-                { "Отчёт по продажам", typeof(SalesReport) },
-                { "Помощник продаж", typeof(SalesAssistant) },
-                { "Настройки", typeof(Pages.Settings) }
-            };
         }
         private void InitializeSignalR()
         {
@@ -161,9 +134,6 @@ namespace Armtek
 
         private void AuthorizationPage_AuthenticationSuccess(object sender, EventArgs e)
         {
-            SalesMenu.Visibility = Visibility.Visible;
-            PurchasesMenu.Visibility = Visibility.Visible;
-            ExchequerMenu.Visibility = Visibility.Visible;
             AuthorizationMenu.Visibility = Visibility.Collapsed;
             RegistrationMenu.Visibility = Visibility.Collapsed;
             foreach(var item in navigationView.MenuItems)

@@ -1,5 +1,4 @@
-﻿using Armtek.Pages.Sales;
-using ModernWpf.Controls;
+﻿using ModernWpf.Controls;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -85,13 +84,7 @@ namespace Armtek.Pages
             TbAccount.Clear();
             PwdPassword.Clear();
             OnAuthenticationSuccess();
-            CustomerOrders ChatPage = new CustomerOrders();
-            Window mainWindow = Application.Current.MainWindow;
-            if (mainWindow is MainWindow mainWin)
-            {
-                mainWin.mainFrame.Navigate(ChatPage);
-                mainWin.navigationView.PaneDisplayMode = NavigationViewPaneDisplayMode.Left;
-            }
+
         }
         private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
         {

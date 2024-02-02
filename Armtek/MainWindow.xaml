@@ -47,53 +47,6 @@
                                 <ui:FontIcon Glyph="&#xE748;"/>
                             </ui:NavigationViewItem.Icon>
                         </ui:NavigationViewItem>
-                        <ui:NavigationViewItem x:Name="SalesMenu" Content="Продажи" Visibility="Collapsed" SelectsOnInvoked="False" IsTabStop="False" FontWeight="Bold">
-                            <ui:NavigationViewItem.Icon>
-                                <ui:FontIcon Glyph="&#xE8C7;"/>
-                            </ui:NavigationViewItem.Icon>
-                            <ui:NavigationViewItem.MenuItems>
-                                <ui:NavigationViewItem x:Name="CustomerOrdersMenu" Content="Заказы клиентов" FontWeight="Bold">
-                                    <ui:NavigationViewItem.MenuItems>
-                                        <ui:NavigationViewItem Content="Создать"/>
-                                        <ui:NavigationViewItem Content="Удалить"/>
-                                    </ui:NavigationViewItem.MenuItems>
-                                </ui:NavigationViewItem>
-                                <ui:NavigationViewItem x:Name="SalesAssistantMenu" Content="Помощник продаж"/>
-                                <ui:NavigationViewItem x:Name="SalesReportMenu" Content="Отчёт по продажам">
-                                    <ui:NavigationViewItem.Icon>
-                                        <ui:FontIcon Glyph="&#xE9F9;"/>
-                                    </ui:NavigationViewItem.Icon>
-                                </ui:NavigationViewItem>
-                                <ui:NavigationViewItem x:Name="SalesDocumentsMenu" Content="Документы продажи"/>
-                                <ui:NavigationViewItem x:Name="ClientsMenu" Content="Клиенты">
-                                    <ui:NavigationViewItem.Icon>
-                                        <ui:FontIcon Glyph="&#xE7EE;"/>
-                                    </ui:NavigationViewItem.Icon>
-                                </ui:NavigationViewItem>
-                                <ui:NavigationViewItem x:Name="AgreementsWithClientsMenu" Content="Договоры с клиентами"/>
-                            </ui:NavigationViewItem.MenuItems>
-                        </ui:NavigationViewItem>
-                        <ui:NavigationViewItemSeparator x:Name="Sep_1"/>
-                        <ui:NavigationViewItem x:Name="PurchasesMenu" Content="Покупки" Visibility="Collapsed" SelectsOnInvoked="False" IsTabStop="False" FontWeight="Bold">
-                            <ui:NavigationViewItem.Icon>
-                                <ui:FontIcon Glyph="&#xEF40;"/>
-                            </ui:NavigationViewItem.Icon>
-                            <ui:NavigationViewItem.MenuItems>
-                                <ui:NavigationViewItem x:Name="ProcurementReportMenu" Content="Отчёт по закупкам"/>
-                                <ui:NavigationViewItem x:Name="PurchasingAssistantMenu" Content="Помощник закупок"/>
-                                <ui:NavigationViewItem x:Name="OrdersToSuppliersMenu" Content="Заказы поставщикам"/>
-                                <ui:NavigationViewItem x:Name="PurchasingDocumentsMenu" Content="Документы закупки"/>
-                            </ui:NavigationViewItem.MenuItems>
-                        </ui:NavigationViewItem>
-                        <ui:NavigationViewItemSeparator Visibility="Collapsed"/>
-                        <ui:NavigationViewItem x:Name="ExchequerMenu" Content="Казначейство" Visibility="Collapsed" SelectsOnInvoked="False" IsTabStop="False" FontWeight="Bold">
-                            <ui:NavigationViewItem.MenuItems>
-                                <ui:NavigationViewItem Content="Безналичные платежи"/>
-                                <ui:NavigationViewItem Content="Расходные кассовые ордеры"/>
-                                <ui:NavigationViewItem Content="Приходные кассовые ордеры"/>
-                                <ui:NavigationViewItem Content="Отчёты по казначейству"/>
-                            </ui:NavigationViewItem.MenuItems>
-                        </ui:NavigationViewItem>
                         <ui:NavigationViewItemSeparator Visibility="Collapsed"/>
                     </ui:NavigationView.MenuItems>
                     <ui:NavigationView.FooterMenuItems>
