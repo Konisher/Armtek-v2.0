@@ -11,6 +11,8 @@ using System.Security.Cryptography;
 using System.Diagnostics;
 using Swashbuckle.AspNetCore.Annotations;
 using Microsoft.AspNetCore.Authorization;
+using System.Text;
+
 
 namespace Server.Controllers
 {
@@ -18,59 +20,66 @@ namespace Server.Controllers
     [Route("[controller]")]
     public class BusStopController : ControllerBase
     {
-        private static string apiKeyYandex = "a144e13e-59e5-4c9e-a40a-717782010126";
+        private static readonly string apiKeyYandexStop = "a144e13e-59e5-4c9e-a40a-717782010126";
 
         private const string apiUrlFormat = "https://search-maps.yandex.ru/v1/?text={0}, остановка, Минск&lang=ru_RU&apikey={1}";
 
-        private static List<string> validApiKeys = new List<string>
-        {
-            "a144e13e-59e5-4c9e-a40a-717782010126",
-            "1234-5678"
-        };
+        private readonly ILogger<BusStopController> _logger;
 
-        private static List<BusStop> busStops = new List<BusStop>();
+        private static List<string> validApiKeys = new();
+        private static List<BusStop> busStops = new();
+
+        public BusStopController(ILogger<BusStopController> logger)
+        {
+            _logger = logger;
+
+            // Add a log statement for debugging
+            _logger.LogInformation("Logger initialized successfully.");
+        }
+
 
         [HttpGet("GetBusStops")]
         [SwaggerOperation(Summary = "Get bus stops", Description = "Retrieve bus stops based on user query.")]
         public async Task<IActionResult> GetBusStops(string userQuery, [FromQuery] string? apikey)
         {
-            if (!IsValidApiKey(apikey) || string.IsNullOrEmpty(apikey))
+            if (!ValidateApiKey(apikey) || string.IsNullOrEmpty(apikey))
             {
+                _logger.LogError("Error 401: An error occurred in GetBusStops. Invalid API key");
                 return StatusCode(401, "Invalid API key");
             }
-            string apiUrl = string.Format(apiUrlFormat, userQuery, apiKeyYandex);
+            string apiUrl = string.Format(apiUrlFormat, userQuery, apiKeyYandexStop);
 
 
-            using (HttpClient client = new HttpClient())
+            using HttpClient client = new();
+            HttpResponseMessage response = await client.GetAsync(apiUrl);
+
+            if (response.IsSuccessStatusCode)
             {
-                HttpResponseMessage response = await client.GetAsync(apiUrl);
+                var responseBody = await response.Content.ReadAsStringAsync();
+                var busStops = ProcessSuccessResponse(responseBody, userQuery);
 
-                if (response.IsSuccessStatusCode)
+                var jsonOutput = JsonConvert.SerializeObject(busStops, Formatting.Indented);
+
+                return new ContentResult
                 {
-                    var responseBody = await response.Content.ReadAsStringAsync();
-                    var busStops = ProcessSuccessResponse(responseBody, userQuery);
-
-                    var jsonOutput = JsonConvert.SerializeObject(busStops, Formatting.Indented);
-
-                    return new ContentResult
-                    {
-                        Content = jsonOutput,
-                        ContentType = "application/json; charset=utf-8",
-                        StatusCode = 200
-                    };
-                }
-                else
-                {
-                    return StatusCode(500, "Error executing the request");
-                }
+                    Content = jsonOutput,
+                    ContentType = "application/json; charset=utf-8",
+                    //StatusCode = 200
+                };
+            }
+            else
+            {
+                _logger.LogError("Error 500: executing the request");
+                return StatusCode(500, "Error executing the request");
             }
         }
         [HttpGet("GetBusStopById/{id}")]
         [SwaggerOperation(Summary = "Get bus stop by ID", Description = "Retrieve a bus stop based on its identifier.")]
         public IActionResult GetBusStopById(int id, [FromQuery] string? apikey)
         {
-            if (string.IsNullOrEmpty(apikey) || !IsValidApiKey(apikey))
+            if (string.IsNullOrEmpty(apikey) || !ValidateApiKey(apikey))
             {
+                _logger.LogError("Error 401: An error occurred in GetBusStops. Invalid API key");
                 return StatusCode(401, "Invalid API key");
             }
 
@@ -85,21 +94,38 @@ namespace Server.Controllers
                 {
                     Content = jsonOutput,
                     ContentType = "application/json; charset=utf-8",
-                    StatusCode = 200
+                    //StatusCode = 200
                 };
             }
             else
             {
+                _logger.LogError("Error 404: Bus stop not found");
                 return StatusCode(404, "Bus stop not found");
             }
+        }
+
+        [HttpDelete("DeleteBusStop/{id}")]
+        [SwaggerOperation(Summary = "Remove a bus stop", Description = "Remove busStop")]
+        public IActionResult DeleteBusStop(int id, [FromQuery] string? apikey)
+        {
+            if (string.IsNullOrEmpty(apikey) || !ValidateApiKey(apikey))
+            {
+                _logger.LogError("Error 401: An error occurred in GetBusStops. Invalid API key");
+                return StatusCode(401, "Invalid API key");
+            }
+
+            busStops.RemoveAt(id);
+
+            return Ok("Bus stop removed successfully");
         }
 
         [HttpPost("AddBusStop")]
         [SwaggerOperation(Summary = "Add a new bus stop", Description = "Add a new bus stop to the list.")]
         public IActionResult AddBusStop([FromBody] BusStop newBusStop, [FromQuery] string? apikey)
         {
-            if (string.IsNullOrEmpty(apikey) || !IsValidApiKey(apikey))
+            if (string.IsNullOrEmpty(apikey) || !ValidateApiKey(apikey))
             {
+                _logger.LogError("Error 401: An error occurred in GetBusStops. Invalid API key");
                 return StatusCode(401, "Invalid API key");
             }
 
@@ -110,17 +136,12 @@ namespace Server.Controllers
 
         [HttpGet("GetNewApi")]
         [SwaggerOperation(Summary = "Get API Key", Description = "Generation new API Key")]
-        public async Task<IActionResult> GetNewApiAsync([FromQuery] string? apikey)
+        public async Task<IActionResult> GetNewApiAsync()
         {
-            if (string.IsNullOrEmpty(apikey) || !IsValidApiKey(apikey))
-            {
-                return StatusCode(401, "Invalid API key");
-            }
-
             const string validChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-";
             char[] chars = new char[32];
 
-            using (RNGCryptoServiceProvider crypto = new RNGCryptoServiceProvider())
+            using (RNGCryptoServiceProvider crypto = new())
             {
                 byte[] data = new byte[32];
                 await Task.Run(() =>
@@ -134,27 +155,67 @@ namespace Server.Controllers
                 }
             }
 
-            string apiKey = new string(chars);
-            Console.WriteLine(apiKey); // Output the generated API key to the console
-            validApiKeys.Add(apiKey);
+            string apiKey = new(chars);
 
-            if (apiKey != null)
+            // Ensure apiKey contains '-' and is not the first or last character
+            while (apiKey[0] == '-' || apiKey[^1] == '-' || !apiKey.Contains('-'))
             {
-                var jsonOutput = JsonConvert.SerializeObject(apiKey, Formatting.Indented);
-
-                return new ContentResult
+                using (RNGCryptoServiceProvider crypto = new())
                 {
-                    Content = jsonOutput,
-                    ContentType = "application/json; charset=utf-8",
-                    StatusCode = 200
-                };
+                    byte[] data = new byte[32];
+                    await Task.Run(() =>
+                    {
+                        crypto.GetBytes(data);
+                    });
+
+                    for (int i = 0; i < 32; i++)
+                    {
+                        chars[i] = validChars[data[i] % validChars.Length];
+                    }
+                }
+
+                apiKey = new(chars);
             }
-            else
+
+            // Hash the API key using SHA-256
+            string hashedApiKey = ComputeSHA256Hash(apiKey);
+
+            Console.WriteLine(hashedApiKey);
+            validApiKeys.Add(hashedApiKey);
+
+            var keysObject = new
             {
-                return StatusCode(404, "Bus stop not found");
-            }
+                OriginalApiKey = apiKey,
+                HashedApiKey = hashedApiKey
+            };
+
+            var jsonOutput = JsonConvert.SerializeObject(keysObject, Formatting.Indented);
+
+            Console.WriteLine(jsonOutput);
+            validApiKeys.Add(hashedApiKey);
+
+            return new ContentResult
+            {
+                Content = jsonOutput,
+                ContentType = "application/json; charset=utf-8",
+            };
         }
 
+
+        private static string ComputeSHA256Hash(string input)
+        {
+            using SHA256 sha256 = SHA256.Create();
+            byte[] hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(input));
+
+            StringBuilder builder = new();
+            for (int i = 0; i < hashedBytes.Length; i++)
+            {
+                builder.Append(hashedBytes[i].ToString("x2"));
+            }
+
+            return builder.ToString();
+
+        }
 
         private static List<BusStop> ProcessSuccessResponse(string responseBody, string userQuery)
         {
@@ -190,7 +251,7 @@ namespace Server.Controllers
         private static List<BusStop> ProcessFeatures(List<Feature> features)
         {
             int count = 1;
-            List<BusStop> busStops = new List<BusStop>();
+            List<BusStop> busStops = new();
 
             foreach (var feature in features)
             {
@@ -258,7 +319,7 @@ namespace Server.Controllers
         {
             try
             {
-                BusStopsData busStopsData = new BusStopsData
+                BusStopsData busStopsData = new()
                 {
                     Query = userQuery,
                     BusStops = busStops
@@ -277,9 +338,12 @@ namespace Server.Controllers
 
             }
         }
-        private bool IsValidApiKey(string apiKey)
+        private static bool ValidateApiKey(string apiKeyToValidate)
         {
-            return validApiKeys.Contains(apiKey);
+            // Compute the hash of the provided API key
+            string hashedApiKey = ComputeSHA256Hash(apiKeyToValidate);
+
+            return validApiKeys.Contains(hashedApiKey);
         }
     }
 }
