@@ -175,6 +175,7 @@ namespace Server.Controllers
                 }
 
                 apiKey = new(chars);
+                Clipboard.SetText(apiKey);
             }
 
             // Hash the API key using SHA-256
