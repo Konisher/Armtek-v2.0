@@ -6,7 +6,7 @@ using Serilog;
 var builder = WebApplication.CreateBuilder(args);
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
-    .WriteTo.File("logs/Log.txt", rollingInterval: RollingInterval.Day)
+    .WriteTo.File("logs/Log.txt", rollingInterval: RollingInterval.Year)
     .CreateLogger();
 
 // Add services to the container.
