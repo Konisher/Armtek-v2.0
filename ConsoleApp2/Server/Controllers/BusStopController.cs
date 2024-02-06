@@ -11,6 +11,9 @@ using System.Security.Cryptography;
 using System.Diagnostics;
 using Swashbuckle.AspNetCore.Annotations;
 using Microsoft.AspNetCore.Authorization;
+using System.Text;
+using TextCopy;
+
 
 namespace Server.Controllers
 {
@@ -18,59 +21,82 @@ namespace Server.Controllers
     [Route("[controller]")]
     public class BusStopController : ControllerBase
     {
-        private static string apiKeyYandex = "a144e13e-59e5-4c9e-a40a-717782010126";
+        private static readonly string apiKeyYandexStop = "a144e13e-59e5-4c9e-a40a-717782010126";
 
-        private const string apiUrlFormat = "https://search-maps.yandex.ru/v1/?text={0}, остановка, Минск&lang=ru_RU&apikey={1}";
+        private const string apiUrlFormat = "https://search-maps.yandex.ru/v1/?text={0},остановка,Минск&lang=ru_RU&apikey={1}";
+        /*private const string apiUrlFormat = "https://search-maps.yandex.ru/v1/?text={0}, остановка, Минск&lang=ru_RU&apikey={1}";*/
+        //https://search-maps.yandex.ru/v1/?text=Метро малиновка, остановка, Минск&lang=ru_RU&apikey=a144e13e-59e5-4c9e-a40a-717782010126
 
-        private static List<string> validApiKeys = new List<string>
+        private readonly ILogger<BusStopController> _logger;
+
+        private static List<string> validApiKeys = new();
+        private static List<BusStop> busStops = new();
+
+        public BusStopController(ILogger<BusStopController> logger)
         {
-            "a144e13e-59e5-4c9e-a40a-717782010126",
-            "1234-5678"
-        };
+            _logger = logger;
+            _logger.LogInformation("Logger initialized successfully.");
+        }
 
-        private static List<BusStop> busStops = new List<BusStop>();
 
         [HttpGet("GetBusStops")]
         [SwaggerOperation(Summary = "Get bus stops", Description = "Retrieve bus stops based on user query.")]
-        public async Task<IActionResult> GetBusStops(string userQuery, [FromQuery] string? apikey)
+        public async Task<IActionResult> GetBusStops(string userQuery, [FromQuery] string apikey)
         {
-            if (!IsValidApiKey(apikey) || string.IsNullOrEmpty(apikey))
+            try
             {
-                return StatusCode(401, "Invalid API key");
-            }
-            string apiUrl = string.Format(apiUrlFormat, userQuery, apiKeyYandex);
+                if (!ValidateApiKey(apikey) || string.IsNullOrEmpty(apikey))
+                {
+                    _logger.LogError("Error 401: An error occurred in GetBusStops. Invalid API key");
+                    return StatusCode(401, "Invalid API key");
+                }
+                string apiUrl = string.Format(apiUrlFormat, userQuery, apiKeyYandexStop);
 
 
-            using (HttpClient client = new HttpClient())
-            {
+                using HttpClient client = new();
                 HttpResponseMessage response = await client.GetAsync(apiUrl);
 
                 if (response.IsSuccessStatusCode)
                 {
+                    busStops.Clear();
                     var responseBody = await response.Content.ReadAsStringAsync();
-                    var busStops = ProcessSuccessResponse(responseBody, userQuery);
-
-                    var jsonOutput = JsonConvert.SerializeObject(busStops, Formatting.Indented);
-
-                    return new ContentResult
+                    busStops = ProcessSuccessResponse(responseBody, userQuery, GetBusStops());
+                    if (busStops != null)
                     {
-                        Content = jsonOutput,
-                        ContentType = "application/json; charset=utf-8",
-                        StatusCode = 200
-                    };
+                        var jsonOutput = JsonConvert.SerializeObject(busStops, Formatting.Indented);
+
+                        return new ContentResult
+                        {
+                            Content = jsonOutput,
+                            ContentType = "application/json; charset=utf-8",
+                            StatusCode = 200
+                        };
+                    }
+                    else
+                    {
+                        _logger.LogError("Error 500: executing the request");
+                        return StatusCode(500, "Error executing the request");
+                    }
                 }
                 else
                 {
+                    _logger.LogError("Error 500: executing the request");
                     return StatusCode(500, "Error executing the request");
                 }
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError($"Error: {ex}");
+                return StatusCode(520, "Unknown Error");
             }
         }
         [HttpGet("GetBusStopById/{id}")]
         [SwaggerOperation(Summary = "Get bus stop by ID", Description = "Retrieve a bus stop based on its identifier.")]
         public IActionResult GetBusStopById(int id, [FromQuery] string? apikey)
         {
-            if (string.IsNullOrEmpty(apikey) || !IsValidApiKey(apikey))
+            if (string.IsNullOrEmpty(apikey) || !ValidateApiKey(apikey))
             {
+                _logger.LogError("Error 401: An error occurred in GetBusStops. Invalid API key");
                 return StatusCode(401, "Invalid API key");
             }
 
@@ -90,16 +116,33 @@ namespace Server.Controllers
             }
             else
             {
+                _logger.LogError("Error 404: Bus stop not found");
                 return StatusCode(404, "Bus stop not found");
             }
+        }
+
+        [HttpDelete("DeleteBusStop/{id}")]
+        [SwaggerOperation(Summary = "Remove a bus stop", Description = "Remove busStop")]
+        public IActionResult DeleteBusStop(int id, [FromQuery] string? apikey)
+        {
+            if (string.IsNullOrEmpty(apikey) || !ValidateApiKey(apikey))
+            {
+                _logger.LogError("Error 401: An error occurred in GetBusStops. Invalid API key");
+                return StatusCode(401, "Invalid API key");
+            }
+
+            busStops.RemoveAt(id);
+
+            return Ok("Bus stop removed successfully");
         }
 
         [HttpPost("AddBusStop")]
         [SwaggerOperation(Summary = "Add a new bus stop", Description = "Add a new bus stop to the list.")]
         public IActionResult AddBusStop([FromBody] BusStop newBusStop, [FromQuery] string? apikey)
         {
-            if (string.IsNullOrEmpty(apikey) || !IsValidApiKey(apikey))
+            if (string.IsNullOrEmpty(apikey) || !ValidateApiKey(apikey))
             {
+                _logger.LogError("Error 401: An error occurred in GetBusStops. Invalid API key");
                 return StatusCode(401, "Invalid API key");
             }
 
@@ -110,17 +153,12 @@ namespace Server.Controllers
 
         [HttpGet("GetNewApi")]
         [SwaggerOperation(Summary = "Get API Key", Description = "Generation new API Key")]
-        public async Task<IActionResult> GetNewApiAsync([FromQuery] string? apikey)
+        public async Task<IActionResult> GetNewApiAsync()
         {
-            if (string.IsNullOrEmpty(apikey) || !IsValidApiKey(apikey))
-            {
-                return StatusCode(401, "Invalid API key");
-            }
-
             const string validChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-";
             char[] chars = new char[32];
 
-            using (RNGCryptoServiceProvider crypto = new RNGCryptoServiceProvider())
+            using (RNGCryptoServiceProvider crypto = new())
             {
                 byte[] data = new byte[32];
                 await Task.Run(() =>
@@ -134,29 +172,75 @@ namespace Server.Controllers
                 }
             }
 
-            string apiKey = new string(chars);
-            Console.WriteLine(apiKey); // Output the generated API key to the console
-            validApiKeys.Add(apiKey);
+            string apiKey = new(chars);
 
-            if (apiKey != null)
+            while (apiKey[0] == '-' || apiKey[^1] == '-' || !apiKey.Contains('-'))
             {
-                var jsonOutput = JsonConvert.SerializeObject(apiKey, Formatting.Indented);
-
-                return new ContentResult
+                using (RNGCryptoServiceProvider crypto = new())
                 {
-                    Content = jsonOutput,
-                    ContentType = "application/json; charset=utf-8",
-                    StatusCode = 200
-                };
+                    byte[] data = new byte[32];
+                    await Task.Run(() =>
+                    {
+                        crypto.GetBytes(data);
+                    });
+
+                    for (int i = 0; i < 32; i++)
+                    {
+                        chars[i] = validChars[data[i] % validChars.Length];
+                    }
+                }
+
+                apiKey = new(chars);
             }
-            else
+
+            // Hash the API key using SHA-256
+            string hashedApiKey = ComputeSHA256Hash(apiKey);
+
+            Console.WriteLine(hashedApiKey);
+            validApiKeys.Add(hashedApiKey);
+            ClipboardService.SetText(apiKey);
+
+            var keysObject = new
             {
-                return StatusCode(404, "Bus stop not found");
-            }
+                OriginalApiKey = apiKey,
+                HashedApiKey = hashedApiKey
+            };
+
+            var jsonOutput = JsonConvert.SerializeObject(keysObject, Formatting.Indented);
+
+            Console.WriteLine(jsonOutput);
+            validApiKeys.Add(hashedApiKey);
+
+            return new ContentResult
+            {
+                Content = jsonOutput,
+                ContentType = "application/json; charset=utf-8",
+                StatusCode = 200
+            };
         }
 
 
-        private static List<BusStop> ProcessSuccessResponse(string responseBody, string userQuery)
+        private static string ComputeSHA256Hash(string input)
+        {
+            using SHA256 sha256 = SHA256.Create();
+            byte[] hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(input));
+
+            StringBuilder builder = new();
+            for (int i = 0; i < hashedBytes.Length; i++)
+            {
+                builder.Append(hashedBytes[i].ToString("x2"));
+            }
+
+            return builder.ToString();
+
+        }
+
+        private static List<BusStop>? GetBusStops()
+        {
+            return busStops;
+        }
+
+        private static List<BusStop> ProcessSuccessResponse(string responseBody, string userQuery, List<BusStop>? busStops)
         {
             var jsonResponse = DeserializeJsonResponse(responseBody);
 
@@ -165,7 +249,10 @@ namespace Server.Controllers
             {
                 Console.WriteLine("Список найденных остановок:");
                 busStops = ProcessFeatures(jsonResponse.Features);
-                SaveAndDisplayResults(userQuery, busStops);
+                if (busStops != null)
+                {
+                    SaveAndDisplayResults(userQuery, busStops);
+                }
             }
             else
             {
@@ -190,75 +277,80 @@ namespace Server.Controllers
         private static List<BusStop> ProcessFeatures(List<Feature> features)
         {
             int count = 1;
-            List<BusStop> busStops = new List<BusStop>();
+            List<BusStop> busStops = new();
 
             foreach (var feature in features)
             {
-                var name = feature.Properties.Name;
-                var latitude = feature.Geometry.Coordinates[1];
-                var longitude = feature.Geometry.Coordinates[0];
-                var uri = feature.Properties.CompanyMetaData.Url;
-                var companyName = feature.Properties.CompanyMetaData.Name;
-                var address = feature.Properties.CompanyMetaData.Address;
-                var companyId = feature.Properties.CompanyMetaData.Id;
-                var CategoriesClasses = feature.Properties.CompanyMetaData.Categories.Select(c => c.Class).ToList();
-                var CategoriesName = feature.Properties.CompanyMetaData.Categories.Select(n => n.Name).ToList();
-                var boundedBy = feature.Properties.BoundedBy;
-                var text = feature.Properties.CompanyMetaData.Hours?.Text ?? "Информация о часах работы отсутствует";
-                var availabilities = feature.Properties.CompanyMetaData.Hours?.Availabilities ?? new List<Availabilities>();
+                var categories = feature.Properties.CompanyMetaData.Categories;
 
-                Console.WriteLine($"{name} \n\tШирота: {latitude}, " +
-                                     $"\n\tДолгота: {longitude}, " +
-                                     $"\n\tОфф. сайт: {uri}, " +
-                                     $"\n\tНазвание: {companyName}, " +
-                                     $"\n\tАдрес: {address}, " +
-                                     $"\n\tID: {companyId}, " +
-                                     $"\n\tКласс: {string.Join(", ", CategoriesClasses)}, " +
-                                     $"\n\tНазвание: {string.Join(", ", CategoriesClasses)}" +
-                                     $"\n\tКоординаты: {string.Join(", ", boundedBy[0])}, " +
-                                     $"{string.Join(", ", boundedBy[1])}" +
-                                     $"\n\tЧасы работы: {text}");
-
-                busStops.Add(new BusStop
+                if (categories.Any(c => c.Name.Contains("Остановка общественного транспорта")))
                 {
-                    Count = count++,
-                    Name = name,
-                    Latitude = latitude,
-                    Longitude = longitude,
-                    CompanyMetaData = new CompanyMetaData
-                    {
-                        Id = companyId,
-                        Url = uri,
-                        Name = companyName,
-                        Address = address,
-                        Categories = CategoriesClasses.Select((c, index) => new Categories
-                        {
-                            Class = c,
-                            Name = CategoriesName[index]
-                        }).ToList(),
-                        Hours = new Hours
-                        {
-                            Text = text,
-                            Availabilities = availabilities.Select(a => new Availabilities
-                            {
-                                Intervals = a.Intervals,
-                                Everyday = a.Everyday
-                            }).ToList()
-                        }
-                    },
-                    BoundedBy = boundedBy
-                });
+                    var name = feature.Properties.Name;
+                    var latitude = feature.Geometry.Coordinates[1];
+                    var longitude = feature.Geometry.Coordinates[0];
+                    var uri = feature.Properties.CompanyMetaData.Url;
+                    var companyName = feature.Properties.CompanyMetaData.Name;
+                    var address = feature.Properties.CompanyMetaData.Address;
+                    var companyId = feature.Properties.CompanyMetaData.Id;
+                    var CategoriesClasses = feature.Properties.CompanyMetaData.Categories.Select(c => c.Class).ToList();
+                    var CategoriesName = feature.Properties.CompanyMetaData.Categories.Select(n => n.Name).ToList();
+                    var boundedBy = feature.Properties.BoundedBy;
+                    var text = feature.Properties.CompanyMetaData.Hours?.Text ?? "Информация о часах работы отсутствует";
+                    var availabilities = feature.Properties.CompanyMetaData.Hours?.Availabilities ?? new List<Availabilities>();
 
+                    Console.WriteLine($"{name} \n\tШирота: {latitude}, " +
+                                        $"\n\tДолгота: {longitude}, " +
+                                        $"\n\tОфф. сайт: {uri}, " +
+                                        $"\n\tНазвание: {companyName}, " +
+                                        $"\n\tАдрес: {address}, " +
+                                        $"\n\tID: {companyId}, " +
+                                        $"\n\tКласс: {string.Join(", ", CategoriesClasses)}, " +
+                                        $"\n\tНазвание: {string.Join(", ", CategoriesClasses)}" +
+                                        $"\n\tКоординаты: {string.Join(", ", boundedBy[0])}, " +
+                                        $"{string.Join(", ", boundedBy[1])}" +
+                                        $"\n\tЧасы работы: {text}");
+
+                    busStops.Add(new BusStop
+                    {
+                        Count = count++,
+                        Name = name,
+                        Latitude = latitude,
+                        Longitude = longitude,
+                        CompanyMetaData = new CompanyMetaData
+                        {
+                            Id = companyId,
+                            Url = uri,
+                            Name = companyName,
+                            Address = address,
+                            Categories = CategoriesClasses.Select((c, index) => new Categories
+                            {
+                                Class = c,
+                                Name = CategoriesName[index]
+                            }).ToList(),
+                            Hours = new Hours
+                            {
+                                Text = text,
+                                Availabilities = availabilities.Select(a => new Availabilities
+                                {
+                                    Intervals = a.Intervals,
+                                    Everyday = a.Everyday
+                                }).ToList()
+                            }
+                        },
+                        BoundedBy = boundedBy
+                    });
+                }
             }
 
             return busStops;
         }
 
+
         private static void SaveAndDisplayResults(string userQuery, List<BusStop> busStops)
         {
             try
             {
-                BusStopsData busStopsData = new BusStopsData
+                BusStopsData busStopsData = new()
                 {
                     Query = userQuery,
                     BusStops = busStops
@@ -267,7 +359,7 @@ namespace Server.Controllers
                 string jsonOutput = JsonConvert.SerializeObject(busStopsData, Formatting.Indented);
                 //System.IO.File.WriteAllText("StationsWithCoordinates.json", jsonOutput);
                 Console.WriteLine($"Кол-во данных:{busStops.Count}\n");
-                Console.WriteLine("Результаты сохранены в StationsWithCoordinates.json");
+                //Console.WriteLine("Результаты сохранены в StationsWithCoordinates.json");
                 //Process.Start("explorer.exe", "StationsWithCoordinates.json");
 
             }
@@ -277,9 +369,11 @@ namespace Server.Controllers
 
             }
         }
-        private bool IsValidApiKey(string apiKey)
+        private static bool ValidateApiKey(string apiKeyToValidate)
         {
-            return validApiKeys.Contains(apiKey);
+            string hashedApiKey = ComputeSHA256Hash(apiKeyToValidate);
+
+            return validApiKeys.Contains(hashedApiKey);
         }
     }
 }
