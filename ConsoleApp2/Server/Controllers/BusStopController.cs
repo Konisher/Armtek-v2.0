@@ -151,6 +151,7 @@ namespace Server.Controllers
             return Ok("Bus stop added successfully");
         }
 
+        [Authorize(Roles = "admin")]
         [HttpGet("GetNewApi")]
         [SwaggerOperation(Summary = "Get API Key", Description = "Generation new API Key")]
         public async Task<IActionResult> GetNewApiAsync()
