@@ -21,4 +21,8 @@
     <PackageReference Include="TextCopy" Version="6.2.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\PersonLib\PersonLib.csproj" />
+  </ItemGroup>
+
 </Project>

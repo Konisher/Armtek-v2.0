@@ -14,9 +14,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfApp2", "WpfApp2\WpfApp2.csproj", "{47A39B54-8A52-4F87-A383-21CF1113D352}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B2EAE8F0-F2FB-4ADC-87D9-964B3F84A008}"
-	ProjectSection(SolutionItems) = preProject
-		.editorconfig = .editorconfig
-	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PersonLib", "PersonLib\PersonLib.csproj", "{687274E4-9F89-4F38-8979-85653B0C5976}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp3", "ConsoleApp3\ConsoleApp3.csproj", "{A7866439-3B97-413B-8865-F91B82FE187F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -40,6 +41,14 @@ Global
 		{47A39B54-8A52-4F87-A383-21CF1113D352}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{47A39B54-8A52-4F87-A383-21CF1113D352}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{47A39B54-8A52-4F87-A383-21CF1113D352}.Release|Any CPU.Build.0 = Release|Any CPU
+		{687274E4-9F89-4F38-8979-85653B0C5976}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{687274E4-9F89-4F38-8979-85653B0C5976}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{687274E4-9F89-4F38-8979-85653B0C5976}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{687274E4-9F89-4F38-8979-85653B0C5976}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7866439-3B97-413B-8865-F91B82FE187F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7866439-3B97-413B-8865-F91B82FE187F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7866439-3B97-413B-8865-F91B82FE187F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7866439-3B97-413B-8865-F91B82FE187F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -47,6 +56,8 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{9EBD32FF-69D8-47BB-AEF3-2CA49453C259} = {B491999D-F208-4D2D-A92C-74941C77B2B2}
 		{47A39B54-8A52-4F87-A383-21CF1113D352} = {B491999D-F208-4D2D-A92C-74941C77B2B2}
+		{687274E4-9F89-4F38-8979-85653B0C5976} = {B491999D-F208-4D2D-A92C-74941C77B2B2}
+		{A7866439-3B97-413B-8865-F91B82FE187F} = {B491999D-F208-4D2D-A92C-74941C77B2B2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {01139722-5CB0-43E3-BB37-D10391A712AF}
